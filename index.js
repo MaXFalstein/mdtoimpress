@@ -1,64 +1,51 @@
-var marked = require('marked');
-var fs = require('fs');
-var pathResolve = require('path').resolve;
+"use strict";
+var marked = require('marked'),
+    fs = require('fs'),
+    pathResolve = require('path').resolve,
 
-var commentReg = /^\s*<!--\s*(.*?)\s*-->\s*$/gm;
-var getMetaData = function (content) {
-    commentReg.lastIndex = 0;
-    var match = commentReg.exec(content);
-    if (!match) {
-        return '';
-    }
-    var metaData = [];
-    var metaArr = match[1].split(/\s+/);
-    metaArr.forEach(function (meta) {
-        var kv = meta.split('=');
-        metaData.push([
-            kv[0].replace(/^data-/, ''),
-            kv[1].replace(/^('|")?(.*?)\1$/, '$2')
-        ]);
-    });
-    return metaData.map(function (meta) {
-        return 'data-' + meta[0] + '="' + meta[1] + '"';
-    }).join(' ');
-};
+    unique = "SPLITHERESPLITHERESPLITHERE",
 
-var createSlideDiv = function (content) {
-    var metaData = getMetaData(content);
-    var html = '<div class="step"';
-    if (metaData) {
-        html += ' ' + metaData;
-    }
-    html += '>';
-    html += marked(content);
-    html += '</div>';
-    return html;
-};
+   createSlideDiv = (slide) => `<div class="step" style="background: ${slide.parent.hue}" ${slide.meta} >${marked(slide.content)}</div>`,
 
-var readFile = function (path) {
-    path = pathResolve(__dirname, path);
-    return String(fs.readFileSync(path));
-};
+//    createSlideDiv = (slide) => `<div class="step" ${slide.meta} >${marked(slide.content)}</div>`,
 
-var createImpressHTML = function (html) {
-    var tpl = readFile('./res/impress.tpl');
-    var data = {
-        html: html,
-        css: readFile('./res/impress.css'),
-        js: readFile('./res/impress.min.js')
+    readFile = function (path) {
+        path = pathResolve(__dirname, path);
+        return String(fs.readFileSync(path));
+    },
+
+    createImpressHTML = function (html) {
+        var tpl = readFile('./res/impress.tpl');
+        var data = {
+            html: html,
+            css: readFile('./res/impress.css'),
+            js: readFile('./res/impress.min.js')
+        };
+        return tpl.replace( /\{\{\$(\w+)\}\}/g, ($, $1) => data[$1] );
+    },
+
+    processMarkdownFile = function (path, layoutEngine, verbosity) {
+
+        var
+            // html defaults to empty if there is not an overview method
+            // in the layoutEngine.
+            content = fs.readFileSync(path, 'utf8'),
+            tempStr = content.replace(
+                layoutEngine.splitter,
+                unique + (layoutEngine.keepSplitterMatch ? "$&" : "")
+            ),
+            contentArr = tempStr.split(unique),
+            slides = layoutEngine.layout(contentArr, verbosity),
+            html=layoutEngine.overview ? layoutEngine.overview() : '';
+
+
+        slides.forEach( (s) => {
+            html += createSlideDiv(s);
+        });
+
+
+
+        return createImpressHTML(html);
     };
-    return tpl.replace(/\{\{\$(\w+)\}\}/g, function ($, $1) {
-        return data[$1];
-    });
-};
-
-var processMarkdownFile = function (path) {
-    var contentArr = String(fs.readFileSync(path)).split(/^-{6,}$/m);
-    var html = '';
-    contentArr.forEach(function (content) {
-        html += createSlideDiv(content);
-    });
-    return createImpressHTML(html);
-};
 
 module.exports = processMarkdownFile;
