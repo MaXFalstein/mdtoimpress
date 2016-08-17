@@ -1,33 +1,42 @@
 {
-    "name": "mdtoimpress",
-    "description": "A tool to convert markdown to impress page.",
-    "version": "0.1.6",
-    "contributors": [
-        { "name": "Steel Liao", "email": "lbbsteel@gmail.com"},
-        { "name": "Rich Boakes", "email": "rjb@port.ac.uk"}
-    ],
-    "bugs": "https://github.com/ear1grey/markdown-impress/issues",
-    "dependencies": {
-        "marked": "*",
-        "commander": "*"
+  "name": "mdtoimpress",
+  "description": "A tool to convert markdown to impress page.",
+  "version": "0.2.0",
+  "contributors": [
+    {
+      "name": "Steel Liao",
+      "email": "lbbsteel@gmail.com"
     },
-    "engines": {
-        "node": ">= 0.9"
-    },
-    "scripts": {
-      "build": "npm run buildmanual; npm run buildlinear; npm run buildradial",
-      "test": "npm run testradial",
-      "buildmanual": "node mdtoimpress -i test/src/manual.md -o test/dest/manual.html -l manual",
-      "buildlinear": "node mdtoimpress -i test/src/auto.md -o test/dest/linear.html -l linear",
-      "buildradial": "node mdtoimpress -i test/src/auto.md -o test/dest/radial.html -l radial",
-      "open": "open test/radial.html"
-    },
-    "homepage": "https://github.com/ear1grey/markdown-impress",
-    "keywords": [
-        "markdown", "impress"
-    ],
-    "license": "MIT",
-    "main": "mdtoimpress.js",
-    "bin": { "mdtoimpress": "mdtoimpress.js" },
-    "repository": "https://github.com/ear1grey/markdown-impress.git"
+    {
+      "name": "Rich Boakes",
+      "email": "rjb@port.ac.uk"
+    }
+  ],
+  "bugs": "https://github.com/ear1grey/markdown-impress/issues",
+  "dependencies": {
+    "marked": "*",
+    "commander": "*"
+  },
+  "engines": {
+    "node": ">= 0.9"
+  },
+  "scripts": {
+    "build": "npm run buildmanual; npm run buildlinear; npm run buildradial",
+    "test": "npm run testradial",
+    "buildmanual": "node mdtoimpress -i test/src/manual.md -o test/dest/manual.html -l manual",
+    "buildlinear": "node mdtoimpress -i test/src/auto.md -o test/dest/linear.html -l linear",
+    "buildradial": "node mdtoimpress -i test/src/auto.md -o test/dest/radial.html -l radial",
+    "open": "open test/radial.html"
+  },
+  "homepage": "https://github.com/ear1grey/markdown-impress",
+  "keywords": [
+    "markdown",
+    "impress"
+  ],
+  "license": "MIT",
+  "main": "mdtoimpress.js",
+  "bin": {
+    "mdtoimpress": "mdtoimpress.js"
+  },
+  "repository": "https://github.com/ear1grey/markdown-impress.git"
 }
