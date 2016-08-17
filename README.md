@@ -2,11 +2,11 @@
 A work in progress...
 
 ## What is it
-`md2i` is a tool to convert markdown to impress pages.  Independent layout engines can exist to allow for different styles of presentation.
+`mdtoimpress` is a tool to convert markdown to impress pages.  Independent layout engines can exist to allow for different styles of presentation.
 
 ## How to install
 + Firstly you should install [nodejs](http://nodejs.org)
-+ Then install it use `$ npm install -g markdown-impress`
++ Then install it use `$ npm install -g mdtoimpress`
 
 ## How To Use
 ```bash
