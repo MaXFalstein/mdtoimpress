@@ -1,5 +1,5 @@
 {
-    "name": "markdown-impress",
+    "name": "mdtoimpress",
     "description": "A tool to convert markdown to impress page.",
     "version": "0.1.6",
     "contributors": [
@@ -15,16 +15,19 @@
         "node": ">= 0.9"
     },
     "scripts": {
+      "build": "npm run buildmanual; npm run buildlinear; npm run buildradial",
       "test": "npm run testradial",
-      "testmanual": "node mdtoimpress -i test/manual.md -o test/manual.html -l manual",
-      "testradial": "node mdtoimpress -i test/auto.md -o test/radial.html -l radial"
+      "buildmanual": "node mdtoimpress -i test/src/manual.md -o test/dest/manual.html -l manual",
+      "buildlinear": "node mdtoimpress -i test/src/auto.md -o test/dest/linear.html -l linear",
+      "buildradial": "node mdtoimpress -i test/src/auto.md -o test/dest/radial.html -l radial",
+      "open": "open test/radial.html"
     },
     "homepage": "https://github.com/ear1grey/markdown-impress",
     "keywords": [
         "markdown", "impress"
     ],
     "license": "MIT",
-    "main": "index.js",
-    "bin": { "mdtoimpress": "mtoi.js" },
+    "main": "mdtoimpress.js",
+    "bin": { "mdtoimpress": "mdtoimpress.js" },
     "repository": "https://github.com/ear1grey/markdown-impress.git"
 }

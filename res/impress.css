@@ -155,3 +155,20 @@ ol, ul {
 small {
     font-size: 25%;
 }
+
+
+.step {
+  display: inline-flex;
+  box-sizing: content-box;
+  padding: 10em;
+  border-radius: 50%;
+  vertical-align: middle;
+  justify-content: center;
+  flex-direction: column;
+  width: 900px;
+  height: 900px;
+}
+
+.step>* {
+  width: 100%;
+}

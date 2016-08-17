@@ -5,9 +5,10 @@ var marked = require('marked'),
 
     unique = "SPLITHERESPLITHERESPLITHERE",
 
-   createSlideDiv = (slide) => `<div class="step" style="background: ${slide.parent.hue}" ${slide.meta} >${marked(slide.content)}</div>`,
-
-//    createSlideDiv = (slide) => `<div class="step" ${slide.meta} >${marked(slide.content)}</div>`,
+   createSlideDiv = (slide) => {
+//     let bg = slide.parent && slide.parent.hue ? slide.parent.hue : "#fff";
+     return `<div class="step" style="background: ${slide.hue}" ${slide.meta} >${marked(slide.content)}</div>`;
+   },
 
     readFile = function (path) {
         path = pathResolve(__dirname, path);
