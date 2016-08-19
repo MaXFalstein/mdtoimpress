@@ -1,7 +1,7 @@
 {
   "name": "mdtoimpress",
   "description": "A tool to convert markdown to impress page.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "contributors": [
     {
       "name": "Steel Liao",
@@ -41,9 +41,8 @@
   },
   "repository": "https://github.com/ear1grey/markdown-impress.git",
   "jshintConfig": {
-        "esversion"     : 6,
-        "node"          : true,
-        "globals"       : {}
+    "esversion": 6,
+    "node": true,
+    "globals": {}
   }
-
 }
