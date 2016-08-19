@@ -1,77 +1,92 @@
 "use strict";
 
 const TAU = 2 * Math.PI;
-const maxAngle = TAU / 3; // one third of a circle.
+const RAD = 57.3;
 const slideRadius = Math.sqrt((1000 * 1000) + (700 * 700));
-const slideGapDefault = slideRadius * 1.6;
-const nnn = 1000; // jiggling number - how many times do we move each slide to ensure a compact layout?
-
+const nnn = 10000; // jiggling number - how many times do we move each slide to ensure a compact layout?
+const shrinkFactor = 0.75;
 
 let
     deepest = 0,
-    primes = {
-        next: 0,
-        seed: 999983 * 2 + 1,
-        all: [17, 31, 617, 1223, 1223, 1223, 617, 37, 17, 13, 1997, 3121, 3469]
-    },
-    sid = 0,
-
-    colour = (deg) => {
-        deg = deg || 0;
-        primes.seed += primes.all[primes.next];
-        primes.next = (primes.next + 1) % 10;
-
-        return `hsl(${primes.seed % 360 + deg},100%,50%)`;
-    };
-
+    sid = 0;
 
 class Slide {
     constructor(content, depth) {
         this._id = ++sid; // auto incrementing slide id
-        this._gap = slideGapDefault;
+        this._radius = slideRadius;
         this._angle = Math.PI;
         this.parent = 0; // there is no slide 0 - i.e. default false parent
         this.content = content;
         this.depth = depth;
         this.scale=1;
+        this._offset = 5*slideRadius;  // a large gap between slides before its reduced by the fitting routine.
+    }
+
+    get liveDepth() {
+        return (this.parent ? this.parent.depth : 0) + 1;
     }
 
     get hue() {
-        return colour(this.angle);
+        return `hsl(${this.overallAngle},${(this.depth-1)/deepest*100}%,75%)`;
     }
+
+    get overallAngle() {
+      // TODO final multiplier is a hack.  should be radians or similar
+      return (this.parent ? this.parent.overallAngle : 0) + (this.angle * 40);
+    }
+
 
     get id() {
         return this._id;
     }
 
-    get xx() {
-        return (this.parent && this.parent.xx ? this.parent.xx : 0) + this.gap * Math.sin(this.angle);
+    get localx() {
+      return ;
     }
 
-    get yy() {
-        return (this.parent && this.parent.yy ? this.parent.yy : 0) + this.gap * Math.cos(this.angle);
+    get x() {
+        return (this.parent ? this.parent.x : 0) + this.offset * Math.sin(this.angle);
+    }
+
+    get y() {
+        return (this.parent ? this.parent.y : 0) + this.offset * Math.cos(this.angle);
     }
 
     get raw() {
         if (this.parent) {
-            return `s${this.id} p${this.parent.id} g${this.gap} c${this.content.slice(0,6)} angle${this.angle}`;
+            return `s${this.id} p${this.parent.id} g${this.radius} c${this.content.slice(0,6)} angle${this.angle}`;
         } else {
             return `s${this.id} TOP angle${this.angle}`;
         }
     }
 
-    get gap() {
-        return this._gap;
+    get radius() {
+        return this._radius;
     }
-    set gap(g) {
+
+    get offset() {
+        return this._offset;
+    }
+
+    reduceOffset() {
+        this._offset -= 1;
+    }
+    increaseOffset() {
+        this._offset += 1;
+    }
+
+    set radius(g) {
         if (g) {
-            this._gap = g;
+            this._radius = g;
         }
     }
 
     get angle() {
         return this._angle;
     }
+
+
+
     set angle(a) {
         if (a) {
             this._angle = a;
@@ -174,17 +189,13 @@ let
             // its children
             let children = slides.filter((s) => s.parent == slide);
             if (children) {
-                let angleStep, angle, childScale, childGap;
-                if (children.length == 1) {
-                    // a single child uses the same angle as it's parent
-                    angle = slide.angle;
-                } else {
-                    childScale = slide.scale * 0.5;
-                    childGap = slide.gap * 0.65;
-                    let bestAngleStep = Math.pow(childGap, 2) / (2 * childGap * slideRadius);
-                    let simpleAngleStep = maxAngle / (children.length - 1);
-
-                    angleStep = Math.min(bestAngleStep, simpleAngleStep);
+                let angleStep, angle, childScale, childRadius;
+                childRadius = slide.radius * shrinkFactor;
+                childScale = slide.scale * shrinkFactor;
+                angle = slide.angle;
+                if (children.length > 1) {
+                    // multiple children need more angular calculation
+                    angleStep = TAU / ( slide.depth + children.length);
                     angle = slide.angle + (((children.length - 1) * angleStep) / 2);
                 }
                 // arrange them either side of the 'direction' angle
@@ -192,7 +203,7 @@ let
                     // naive resize for now.
                     child.scale = childScale;
                     child.angle = angle;
-                    child.gap = childGap;
+                    child.radius = childRadius;
                     angle -= angleStep;
                 });
             }
@@ -207,15 +218,12 @@ let
             if (debug > 1) console.log("preparing meta ", slide.raw);
 
             let data = [];
-            data.push(["x", slide.xx]);
-            data.push(["y", slide.yy]);
+            data.push(["x", slide.x]);
+            data.push(["y", slide.y]);
             data.push(["z", 0]);
             data.push(["hue", slide.hue]);
             if (slide.scale) {
-                console.log("Scale is", slide.scale);
                 data.push(["scale", slide.scale]);
-            } else {
-                console.log("NO SCALE", slide.scale);
             }
 
             slide.meta = data.map(
@@ -240,28 +248,51 @@ let
             seedb = 221175,
             seedc = 12345;
 
+        let moves=0;
+        let leaves=0;
+
+        let combinedRadii = 0;
         for (let h = nnn; h > 0; h--) {
 
-            slides.map((s) => {
-                if (s.canMove) {
-                    s.gap = Math.abs(s.gap - 10);
-                }
-                s.canMove = true;
-            });
+            for (let i = slides.length-1; i >= 0; i--) {
 
-            for (let i = slides.length - 1; i >= 0; i--) {
-                for (let j = i - 1; j >= 0; j--) {
-                    a = slides[i];
+                a = slides[i];
+                a.canMove = true;
+
+                for (let j = slides.length-1 ; j >= 0; j--) {
+
                     b = slides[j];
-                    xdiff = Math.pow(a.xx - b.xx, 2);
-                    ydiff = Math.pow(a.yy - b.yy, 2);
-                    distance = Math.sqrt(xdiff + ydiff);
+                    if (a===b) {
+                      continue;
+                    }
+                    combinedRadii = (a.radius + b.radius)/2;
 
-                    if (distance < slideRadius) {
+                    xdiff = Math.abs(a.x - b.x);
+                    ydiff = Math.abs(a.y - b.y);
+                    distance = Math.sqrt(xdiff*xdiff+ydiff*ydiff);
+
+                    if (distance === 0 && debug>1) {
+                      console.log(`Slides ${a.id} and ${b.id} have zero distance...???`);
+                    }
+
+                    if (distance < combinedRadii) {
                         a.canMove = false;
                     }
+
                 }
+
+                if (a.canMove) {
+                  a.reduceOffset();
+                  moves++;
+                } else {
+                  leaves++;
+//                  a.increaseOffset();
+                }
+
             }
+        }
+        if (debug>0) {
+          console.log("During fitting there were", moves, "node moves.");
         }
     };
 
@@ -292,18 +323,17 @@ module.exports = {
                 };
 
             slideDeck.forEach((slide) => {
-                i.x.max = Math.max(slide.xx, i.x.max);
-                i.x.min = Math.min(slide.xx, i.x.min);
-                i.y.max = Math.max(slide.yy, i.y.max);
-                i.y.min = Math.min(slide.yy, i.y.min);
+                i.x.max = Math.max(slide.x, i.x.max);
+                i.x.min = Math.min(slide.x, i.x.min);
+                i.y.max = Math.max(slide.y, i.y.max);
+                i.y.min = Math.min(slide.y, i.y.min);
             });
 
             i.x.middle = i.x.max + i.x.min;
             i.y.middle = i.y.max + i.y.min;
-            i.x.max = Math.max(Math.abs(i.x.max), Math.abs(i.x.min))
-            i.y.max = Math.max(Math.abs(i.y.max), Math.abs(i.y.min))
+            i.x.max = Math.max(Math.abs(i.x.max), Math.abs(i.x.min));
+            i.y.max = Math.max(Math.abs(i.y.max), Math.abs(i.y.min));
             i.xy.max = Math.max(i.x.max, i.y.max)*2;
-            console.log("Maxes", i);
 
             // find the largest and smallest x and y values
             // that are reffered to by slides.

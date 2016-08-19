@@ -2,6 +2,7 @@
 var marked = require('marked'),
     fs = require('fs'),
     pathResolve = require('path').resolve,
+    debug = 0,
 
     unique = "SPLITHERESPLITHERESPLITHERE",
 
@@ -14,10 +15,14 @@ var marked = require('marked'),
         var result;
         try {
           result = String(fs.readFileSync(path));
-          console.log("Loaded:", path);
+          if (debug>0) {
+            console.log("Loaded:", path);
+          }
         } catch (e) {
           result = null;
-          console.log("Not Loaded:", path);
+          if (debug>0) {
+            console.log("Not Loaded:", path);
+          }
         }
 
         return result;
@@ -26,6 +31,7 @@ var marked = require('marked'),
     createImpressHTML = function (html, layout) {
         var tpl = readFile('./res/impress.tpl');
         var data = {
+            title: "Words",
             html: html,
             css: readFile('./res/impress.css'),
             themecss: layout.css,
@@ -35,6 +41,8 @@ var marked = require('marked'),
     },
 
     mdtoimpress = function (path, layoutFolder, verbosity) {
+
+        debug = verbosity;
 
         let layout = {};
         layout.engineFN = `./layout/${layoutFolder}/${layoutFolder}.js`;

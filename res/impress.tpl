@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=1024" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <title>impress.js</title>
+    <title>{{$title}}</title>
     <style type="text/css">{{$css}}</style>
     <style type="text/css">{{$themecss}}</style>
 </head>

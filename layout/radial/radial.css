@@ -1,3 +1,4 @@
+/*
 body {
   background:-webkit-gradient(radial,50% 50%,0,50% 50%,500,from(#59379E),to(#8967BE));
   background:-webkit-radial-gradient(#59379E,# #8967BE);
@@ -6,6 +7,7 @@ body {
   background:-o-radial-gradient(#59379E,# #8967BE);
   background:radial-gradient(#59379E,# #8967BE);
 }
+*/
 
 .step {
     height: 700px;
