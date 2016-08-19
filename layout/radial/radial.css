@@ -1,0 +1,51 @@
+body {
+  background:-webkit-gradient(radial,50% 50%,0,50% 50%,500,from(#59379E),to(#8967BE));
+  background:-webkit-radial-gradient(#59379E,# #8967BE);
+  background:-moz-radial-gradient(#59379E,# #8967BE);
+  background:-ms-radial-gradient(#59379E,# #8967BE);
+  background:-o-radial-gradient(#59379E,# #8967BE);
+  background:radial-gradient(#59379E,# #8967BE);
+}
+
+.step {
+    height: 700px;
+    width: 1000px;
+    border: solid thick white;
+    border-radius: 0.5em;
+}
+
+h1 {
+    font-size: 6rem;
+}
+h2 {
+    font-size: 5rem;
+}
+h3 {
+    font-size: 4rem;
+}
+
+h4 {
+    font-size: 3.5rem;
+}
+
+h5 {
+    font-size: 3rem;
+}
+
+h6 {
+    font-size: 2rem;
+}
+
+li {
+    padding: 0.25ex;
+}
+
+
+img {
+    width: 50%;
+}
+
+ol, ul {
+    padding-left: 1em;
+    font-size: 80%;
+}

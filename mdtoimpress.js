@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 "use strict";
 
-var mtoi = require('./index.js');
+var mdtoimpress = require('./index.js');
 var program = require('commander');
 var path = require('path');
 var fs = require('fs');
 var pkg = require('./package');
-var layoutEngine;
+var layout;
 
 program.version(pkg.version)
     .option('-i, --input <path>', 'Input markdown file path')
@@ -37,11 +37,10 @@ if (!program.input || !program.output) {
 if (!program.layout) {
     program.layout = "manual";
 }
-layoutEngine = require(`./layout/${program.layout}.js`);
 
 var basePath = process.cwd();
 var input = path.resolve(basePath, program.input);
 var output = path.resolve(basePath, program.output);
 
-var html = mtoi(input, layoutEngine, program.verbose);
+var html = mdtoimpress(input, program.layout);
 fs.writeFileSync(output, html);
