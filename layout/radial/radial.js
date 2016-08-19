@@ -3,11 +3,12 @@
 const TAU = 2 * Math.PI;
 const maxAngle = TAU / 3; // one third of a circle.
 const slideRadius = Math.sqrt((1000 * 1000) + (700 * 700));
-const slideGapDefault = 5 * slideRadius * 1.6;
-const nnn = 10000; // jiggling number - how many times do we move each slide to ensure a compact layout?
+const slideGapDefault = slideRadius * 1.6;
+const nnn = 1000; // jiggling number - how many times do we move each slide to ensure a compact layout?
 
 
 let
+    deepest = 0,
     primes = {
         next: 0,
         seed: 999983 * 2 + 1,
@@ -32,6 +33,7 @@ class Slide {
         this.parent = 0; // there is no slide 0 - i.e. default false parent
         this.content = content;
         this.depth = depth;
+        this.scale=1;
     }
 
     get hue() {
@@ -107,13 +109,16 @@ let
 
         for (let i = content.length - 1; i >= 0; i--) {
             for (let j = i - 1; j >= 0; j--) {
-                if (debug > 2) console.log("Comparing ", content[j].id, content[j].depth, "with", content[i].id, content[i].depth, content[j].depth < content[i].depth);
+                if (debug > 2) {
+                  console.log("Comparing ", content[j].id, content[j].depth, "with", content[i].id, content[i].depth, content[j].depth < content[i].depth);
+                }
                 if (content[j].depth < content[i].depth) {
                     // we have found its parent, so record it
-                    if (debug > 1) console.log("Aha!", content[j].id, content[j].depth, "with", content[i].id, content[i].depth);
+                    if (debug > 1) {
+                      console.log("Aha!", content[j].id, content[j].depth, "with", content[i].id, content[i].depth);
+                    }
                     content[i].parent = content[j];
-                    // and move on with the next unparented entry
-                    break;
+                    break; // and move on with the next unparented entry
                 }
             }
         }
@@ -137,14 +142,14 @@ let
             console.error("Bad Slide!  NO BISCUIT!");
         }
         slide.angle = 2 * TAU;
-        slide.scale = 10;
+        slide.scale = deepest;
         console.log("Single central slide", slide.scale);
     },
 
     positionMultipleCentralSlides = (content) => {
         let angle = 3.5 * Math.PI;
         let slides = content.filter((slide) => slide.depth == 1);
-        let radius = 5 * innerCircleRadius(slides.length);
+        let radius = innerCircleRadius(slides.length);
         let stepSize = TAU / slides.length;
         slides.forEach((slide) => {
             slide.angle = angle;
@@ -174,8 +179,8 @@ let
                     // a single child uses the same angle as it's parent
                     angle = slide.angle;
                 } else {
-                    childScale = slide.scale * 0.25;
-                    childGap = (this.gap ? this.gap * 0.9 : slideGapDefault);
+                    childScale = slide.scale * 0.5;
+                    childGap = slide.gap * 0.65;
                     let bestAngleStep = Math.pow(childGap, 2) / (2 * childGap * slideRadius);
                     let simpleAngleStep = maxAngle / (children.length - 1);
 
@@ -208,7 +213,7 @@ let
             data.push(["hue", slide.hue]);
             if (slide.scale) {
                 console.log("Scale is", slide.scale);
-                data.push(["scale", slide.scale * 1000]);
+                data.push(["scale", slide.scale]);
             } else {
                 console.log("NO SCALE", slide.scale);
             }
@@ -252,7 +257,7 @@ let
                     ydiff = Math.pow(a.yy - b.yy, 2);
                     distance = Math.sqrt(xdiff + ydiff);
 
-                    if (distance < slideRadius * 1.6) {
+                    if (distance < slideRadius) {
                         a.canMove = false;
                     }
                 }
@@ -282,24 +287,31 @@ module.exports = {
                     y: {
                         max: 0,
                         min: 0
-                    }
+                    },
+                    xy: {}
                 };
 
             slideDeck.forEach((slide) => {
                 i.x.max = Math.max(slide.xx, i.x.max);
-                i.x.min = Math.max(slide.xx, i.x.min);
+                i.x.min = Math.min(slide.xx, i.x.min);
                 i.y.max = Math.max(slide.yy, i.y.max);
-                i.y.min = Math.max(slide.yy, i.y.min);
+                i.y.min = Math.min(slide.yy, i.y.min);
             });
 
-            xdiff = Math.abs(i.x.min) + i.x.max;
-            ydiff = Math.abs(i.y.min) + i.y.max;
-
-            let deepest = Math.sqrt(xdiff * xdiff + ydiff * ydiff) / 3 * 4;
+            i.x.middle = i.x.max + i.x.min;
+            i.y.middle = i.y.max + i.y.min;
+            i.x.max = Math.max(Math.abs(i.x.max), Math.abs(i.x.min))
+            i.y.max = Math.max(Math.abs(i.y.max), Math.abs(i.y.min))
+            i.xy.max = Math.max(i.x.max, i.y.max)*2;
+            console.log("Maxes", i);
 
             // find the largest and smallest x and y values
             // that are reffered to by slides.
-            return `<div id="overview" class="step step-overview" data-z=${deepest}></div>`;
+            return `<div id="overview" class="step step-overview"
+            data-x=${i.x.middle}
+            data-y=${i.y.middle/2}
+            data-z=${i.xy.max}>
+            </div>`;
         }
 
     },
@@ -309,6 +321,8 @@ module.exports = {
 
         slideDeck = discoverDepths(content);
         slideDeck = slideDeck.filter((x) => x); // remove undefined's
+        slideDeck = slideDeck.filter((x) => x); // remove undefined's
+        deepest = slideDeck.reduce((a,b)=>a.depth>b.depth?a:b).depth;
         establishParentage(slideDeck);
         insertInnerCircle(slideDeck);
         populateBranches(slideDeck);
