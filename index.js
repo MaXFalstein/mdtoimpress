@@ -34,7 +34,8 @@ var marked = require('marked'),
             title: "Words",
             html: html,
             css: readFile('./res/impress.css'),
-            themecss: layout.css,
+            themecss: layout.themecss,
+            themejs: layout.themejs,
             js: readFile('./res/impress.min.js')
         };
         return tpl.replace( /\{\{\$(\w+)\}\}/g, ($, $1) => data[$1] );
@@ -46,9 +47,11 @@ var marked = require('marked'),
 
         let layout = {};
         layout.engineFN = `./layout/${layoutFolder}/${layoutFolder}.js`;
-        layout.cssFN = `./layout/${layoutFolder}/${layoutFolder}.css`;
+        layout.themecssFN = `./layout/${layoutFolder}/${layoutFolder}.css`;
+        layout.themejsFN = `./layout/${layoutFolder}/${layoutFolder}.browser.js`;
         layout.engine = require(layout.engineFN);
-        layout.css = readFile(layout.cssFN);
+        layout.themecss = readFile(layout.themecssFN);
+        layout.themejs = readFile(layout.themejsFN);
 
         var
             // html defaults to empty if there is not an overview method
