@@ -1,5 +1,7 @@
 "use strict";
 
+let overviewSlideName = "overview";
+let lastSlide = '';
 let reported = '';
 
 let reportElem = (e) => {
@@ -17,6 +19,26 @@ let reportElem = (e) => {
   }
 };
 
+let keyCheck = (e) => {
+  console.log(e.key);
+  if (e.key == "o") {
+    var hash = window.location.hash.substr(1);
+    if (hash == "/"+overviewSlideName) {
+      if (lastSlide !== '') {
+        impress().goto(
+          document.getElementById(lastSlide.replace("/", ""))
+        );
+      }
+    } else {
+      lastSlide = hash;
+      impress().goto(
+        document.getElementById(overviewSlideName)
+      );      
+    }
+    e.stopPropagation();
+  }
+  reportElem(e.target);
+};
 
 let reportSlide = (e) => {
   reportElem(e.target);
@@ -24,6 +46,8 @@ let reportSlide = (e) => {
 
 let prep = () => {
   document.addEventListener('mouseenter', reportSlide, true);
+  document.addEventListener('keypress', keyCheck, true);
+
 };
 
 window.addEventListener("load", prep);
