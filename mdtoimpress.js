@@ -42,5 +42,5 @@ var basePath = process.cwd();
 var input = path.resolve(basePath, program.input);
 var output = path.resolve(basePath, program.output);
 
-var html = mdtoimpress(input, program.layout);
+var html = mdtoimpress(input, program.layout, program.verbose);
 fs.writeFileSync(output, html);
