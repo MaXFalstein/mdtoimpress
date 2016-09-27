@@ -9,7 +9,8 @@
     <style type="text/css">{{$themecss}}</style>
 </head>
 <body>
-    <div id="impress">{{$html}}</div>
+    <div id="impress" data-transition-duration=200>{{$html}}</div>
     <script>{{$js}}</script>
+    <script>{{$themejs}}</script>
     <script>impress().init();</script>
 </body>
