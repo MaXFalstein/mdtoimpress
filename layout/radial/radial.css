@@ -8,6 +8,10 @@ body {
   color: #fff;
 }
 
+* {
+  font-size: 100%;
+}
+
 /*
 body {
   background: black !important;
@@ -26,28 +30,29 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     overflow: auto;
     position: relative;
+    line-height: 100%;
 }
 
 h1 {
-    font-size: 6rem;
+    font-size: 160%;
 }
 h2 {
-    font-size: 5rem;
+    font-size: 150%;
 }
 h3 {
-    font-size: 4rem;
+    font-size: 140%;
 }
 
 h4 {
-    font-size: 3.5rem;
+    font-size: 130%;
 }
 
 h5 {
-    font-size: 3rem;
+    font-size: 120%;
 }
 
 h6 {
-    font-size: 2rem;
+    font-size: 110%;
 }
 
 li {
