@@ -21,13 +21,15 @@
     "node": ">= 0.9"
   },
   "scripts": {
-    "build": "npm run buildmanual; npm run buildlinear; npm run buildradial; npm run buildflythru",
+    "build": "npm run buildradial; npm run buildlinear; npm run buildmanual; npm run buildflythru",
     "test": "npm run testradial",
     "buildmanual": "node mdtoimpress -i test/src/manual.md -o test/dest/manual.html -l manual",
     "buildlinear": "node mdtoimpress -i test/src/auto.md -o test/dest/linear.html -l linear",
     "buildflythru": "node mdtoimpress -i test/src/auto.md -o test/dest/flythru.html -l flythru",
-    "buildradial": "node mdtoimpress -i test/src/auto.md -o test/dest/radial.html -l radial",
-    "open": "open test/radial.html"
+    "buildradial": "node mdtoimpress -i test/src/wr.md -o test/dest/radial.html -l radial",
+    "open": "open test/radial.html",
+    "bw": "node mdtoimpress -i test/src/webf1intro.md -o test/dest/webf1intro.html -l radial",
+    "open": "open test/webf1intro.html"
   },
   "homepage": "https://github.com/ear1grey/markdown-impress",
   "keywords": [
@@ -41,8 +43,10 @@
   },
   "repository": "https://github.com/ear1grey/markdown-impress.git",
   "jshintConfig": {
+    "browser" : true,
     "esversion": 6,
     "node": true,
-    "globals": {}
+    "predef": ["body"],
+    "loopfunc": true
   }
 }
